@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>ConverImage</artifactId>
+    <artifactId>Convert-image</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>ConverImage</name>
     <description>ConverImage</description>
@@ -27,7 +27,9 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
+
 
     <build>
         <plugins>
