@@ -1,51 +1,47 @@
 package com.example.ImageConverter;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
-
-public class ImageConverter {
+public class WebpConverter {
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.out.println("Usage: java WebpConverter <source_directory> <destination_directory>");
+
+
+        String inputDirectoryPath = "E:\\pic\\jpg";
+        String outputDirectoryPath = "E:\\pic\\webp2";
+
+        // Create the output directory if it doesn't exist
+        File outputDirFile = new File(outputDirectoryPath);
+        if (!outputDirFile.exists()) {
+            outputDirFile.mkdirs();
+        }
+
+        File inputDirectory = new File(inputDirectoryPath);
+        File[] jpgFiles = inputDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".jpg"));
+
+        if (jpgFiles == null) {
+            System.out.println("The input folder is empty or the path is incorrect!");
             return;
         }
 
-        String sourceDirectory = args[0];
-        String destinationDirectory = args[1];
+        for (File jpgFile : jpgFiles) {
+            String jpgFileName = jpgFile.getName();
+            String webpFileName = jpgFileName.substring(0, jpgFileName.lastIndexOf(".")) + ".webp";
+            String outputImagePath = outputDirectoryPath + File.separator + webpFileName;
 
-        try {
-            Files.walkFileTree(Paths.get(sourceDirectory), new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    if (Files.isRegularFile(file)) {
-                        // تبدیل فایل به فرمت WebP
-                        String fileName = file.getFileName().toString();
-                        String outputPath = destinationDirectory + "/" + fileName.replace(".jpg", ".webp");
+            try {
+                // Running the cwebp command to convert an image to the WebP format
+                //Syntax :  cwebp [options] input_file -o output_file.webp
+                ProcessBuilder processBuilder = new ProcessBuilder("cwebp", jpgFile.getAbsolutePath(), "-o", outputImagePath);
+                processBuilder.redirectErrorStream(true);
 
-                        ProcessBuilder processBuilder = new ProcessBuilder("cwebp.exe", file.toString(), "-o", outputPath);
-                        processBuilder.redirectErrorStream(true);
-
-                        Process process = processBuilder.start();
-                        try {
-                            process.waitFor();
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        System.out.println("تصویر " + fileName + " به فرمت WebP تبدیل شد.");
-                    }
-
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-
-            System.out.println("تمام فایل‌ها به فرمت WebP تبدیل شدند.");
-        } catch (IOException e) {
-            e.printStackTrace();
+                Process process = processBuilder.start();
+                process.waitFor();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+
+        System.out.println("All jpg images have been converted to the WebP format!");
     }
 }
